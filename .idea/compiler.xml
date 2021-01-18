@@ -14,6 +14,7 @@
         <module name="meinian_jobs" />
         <module name="meinian_web" />
         <module name="meinian_pojo" />
+        <module name="gitTest" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

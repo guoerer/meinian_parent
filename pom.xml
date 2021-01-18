@@ -17,6 +17,7 @@
         <module>meinian_web</module>
         <module>meinian_jobs</module>
         <module>meinian_mobile_web</module>
+        <module>gitTest</module>
 
     </modules>
 
