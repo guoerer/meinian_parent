@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.dao.MemberDao">
+    <!--根据手机号查询该用户存在-->
+    <select id="selectByPhone" resultType="member" parameterType="string">
+        select * from t_member where phoneNumber=#{telephone}
+    </select>
+
+    <!--添加用户信息到数据库中-->
+    <insert id="addMember" parameterType="member" useGeneratedKeys="true" keyProperty="id">
+        insert into t_member(fileNumber,name,sex,idCard,phoneNumber,regTime,password,email,birthday,remark)
+          values
+          (#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},#{regTime},#{password},#{email},#{birthday},#{remark})
+    </insert>
+    <!--根据日期查询用户人数-->
+    <select id="findMemberCountBeforeDate" resultType="int" parameterType="string">
+            select count(id) from t_member where regTime &lt;= #{regTime}
+    </select>
+    <!--每天新增-->
+    <select id="getTodayNewMember" resultType="integer">
+        select count(id) from  t_member where regTime = #{regTime}
+    </select>
+    <!--总会员数-->
+    <select id="getTotalMember" resultType="integer">
+        select count(id) from  t_member
+    </select>
+
+    <!--本周新增数-->
+    <select id="getThisWeekAndMonthNewMember" resultType="integer">
+        select count(id) from  t_member where regTime &gt;= #{regTime}
+    </select>
+</mapper>

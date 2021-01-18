@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.dao.TravelGroupDao">
+
+    <!--自定义结果集，根据团体游id查询团体游的所有数据，包含自由行数据-->
+    <resultMap id="findTravelGroupListById" type="TravelGroup">
+        <id column="id" property="id"></id>
+        <result property="code" column="code"></result>
+        <result property="name" column="name"></result>
+        <result property="helpCode" column="helpCode"></result>
+        <result property="sex" column="sex"></result>
+        <result property="remark" column="remark"></result>
+        <result property="attention" column="attention"></result>
+        <!--多表联查，通过团体游的id查询自由行的数据-->
+        <collection property="travelItems" column="id" select="com.atguigu.dao.TravelItemDao.findTravelItemListById"></collection>
+    </resultMap>
+
+
+
+    <!--向团体游中添加数据,返回自增长的主键id-->
+    <insert id="add" parameterType="TravelGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into t_travelgroup(code,name,helpCode,sex,remark,attention)
+        values (#{code},#{name},#{helpCode},#{sex},#{remark},#{attention})
+    </insert>
+    <!--向中间表中添加对应的团体id和自由行项目-->
+    <insert id="setTravelGroupAndTravelItem" parameterType="map">
+        insert into t_travelgroup_travelitem(travelgroup_id,travelitem_id) values (#{travelGroup},#{travelItem})
+    </insert>
+
+    <!--分页查询结-->
+    <select id="findPage" parameterType="string" resultType="TravelGroup">
+        select * from t_travelgroup
+        <where>
+            <if test="value!=null and value.length>0">
+                code =#{value} or name like concat('%',#{value},'%')  or helpCode=#{value}
+            </if>
+        </where>
+    </select>
+
+    <!--根据id值查询团队游数据-->
+    <select id="findById" resultType="TravelGroup">
+        select * from t_travelgroup where id=#{id}
+    </select>
+    <!--修改团队游数据-->
+    <update id="edit" parameterType="travelGroup" >
+        update t_travelgroup
+        <set>
+            <if test="code!=null and code.length>0">
+                code = #{code},
+            </if>
+            <if test="name!=null and name.length>0">
+                name = #{name},
+            </if>
+            <if test="helpCode!=null and helpCode.length>0">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex!=null and sex.length>0">
+                sex = #{sex},
+            </if>
+            <if test="remark!=null and remark.length>0">
+                remark = #{remark},
+            </if>
+            <if test="attention!=null and attention.length>0">
+                attention = #{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <!--删除团队游数据-->
+    <delete id="delteById" >
+        delete from t_travelgroup where id=#{id}
+    </delete>
+    <!--查询所有团体游数据-->
+    <select id="findAll" resultType="TravelGroup">
+        select * from t_travelgroup
+    </select>
+
+
+    <!--根据套餐id查询团体游数据
+        1| 先根据中间表查询出套餐id对应的团体的id
+        2、跟据由1得到的团体id，查询团体的详细数据   -->
+    <select id="findTravelGroupListById" resultMap="findTravelGroupListById" >
+         select * from t_travelgroup where id in(select travelgroup_id from t_setmeal_travelgroup  where setmeal_id=#{id})
+    </select>
+
+    <!--中间表数据相关操作语句-->
+    <!--根据团队id删除中间表自由行项目(根据团队id删除了所有中间表数据)-->
+    <delete id="delteTravelItemByGroupId" >
+        delete from t_travelgroup_travelitem where travelgroup_id =#{id}
+    </delete>
+    <!--根据团体id查询自由行中项目-->
+    <select id="findTravelItemIdByTravelgroupId" resultType="integer">
+        select travelitem_id from t_travelgroup_travelitem where travelgroup_id =#{id}
+    </select>
+</mapper>
